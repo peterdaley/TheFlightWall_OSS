@@ -7,3 +7,4 @@
 # User-specific config — copy the .example files and fill in your own values
 config/APIConfiguration.h
 config/UserConfiguration.h
+config/WiFiConfiguration.h
