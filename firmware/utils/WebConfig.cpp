@@ -162,6 +162,7 @@ void WebConfig::handleGetConfig(WiFiClient &c)
     doc["center_lat"]                    = g_config.center_lat;
     doc["center_lon"]                    = g_config.center_lon;
     doc["radius_km"]                     = g_config.radius_km;
+    doc["min_altitude_ft"]               = g_config.min_altitude_ft;
     doc["display_brightness"]            = g_config.display_brightness;
     doc["text_color_r"]                  = g_config.text_color_r;
     doc["text_color_g"]                  = g_config.text_color_g;
@@ -221,6 +222,7 @@ void WebConfig::handlePostConfig(WiFiClient &c, const Req &r)
     g_config.center_lat   = doc["center_lat"]   | g_config.center_lat;
     g_config.center_lon   = doc["center_lon"]   | g_config.center_lon;
     g_config.radius_km    = doc["radius_km"]    | g_config.radius_km;
+    g_config.min_altitude_ft = doc["min_altitude_ft"] | g_config.min_altitude_ft;
 
     g_config.display_brightness = (uint8_t)(doc["display_brightness"] | (int)g_config.display_brightness);
     g_config.text_color_r       = (uint8_t)(doc["text_color_r"]       | (int)g_config.text_color_r);
@@ -485,6 +487,7 @@ const char kHtmlPage[] =
 "<div class=\"f\"><label>Longitude</label><input type=\"number\" step=\"any\" id=\"center_lon\"></div>"
 "</div>"
 "<div class=\"f\"><label>Search radius (km)</label><input type=\"number\" step=\"1\" min=\"1\" id=\"radius_km\"></div>"
+"<div class=\"f\"><label>Minimum altitude (ft) <small>(blank = no filter)</small></label><input type=\"number\" step=\"1\" min=\"0\" placeholder=\"blank = no filter\" id=\"min_altitude_ft\"></div>"
 "<h2>Display</h2>"
 "<div class=\"r2\">"
 "<div class=\"f\"><label>Brightness (0-255)</label><input type=\"number\" min=\"0\" max=\"255\" id=\"display_brightness\"></div>"
@@ -563,6 +566,7 @@ const char kHtmlPage[] =
 "if(e.type==='checkbox')e.checked=!!d[k];else e.value=d[k];"
 "});"
 "var toTime=function(m){var h=Math.floor(m/60),n=m%60;return(h<10?'0'+h:''+h)+':'+(n<10?'0'+n:''+n);};"
+"var maEl=document.getElementById('min_altitude_ft');if(maEl&&d.min_altitude_ft===-1)maEl.value='';"
 "document.getElementById('night_start_time').value=toTime(d.night_start_minutes||0);"
 "document.getElementById('night_end_time').value=toTime(d.night_end_minutes||0);"
 "document.getElementById('utc_offset_hours').value=parseFloat((d.utc_offset_minutes/60).toFixed(2));"
@@ -588,6 +592,7 @@ const char kHtmlPage[] =
 "'display_flip','night_mode_enabled','opensky_priority'].forEach(function(k){d[k]=document.getElementById(k).checked;});"
 "d.screen_facing=document.getElementById('screen_facing').value;"
 "d.tar1090_host=document.getElementById('tar1090_host').value;"
+"var ma=document.getElementById('min_altitude_ft').value;d.min_altitude_ft=ma===''?-1:parseInt(ma);"
 "var toMin=function(t){var p=(t||'00:00').split(':');return parseInt(p[0])*60+(parseInt(p[1])||0);};"
 "d.night_start_minutes=toMin(document.getElementById('night_start_time').value);"
 "d.night_end_minutes=toMin(document.getElementById('night_end_time').value);"

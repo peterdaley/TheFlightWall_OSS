@@ -186,6 +186,8 @@ bool OpenSkyFetcher::fetchStateVectors(double centerLat,
     http.setTimeout(TimingConfiguration::OPENSKY_TIMEOUT_MS);
     // OAuth Bearer required
     http.addHeader("Authorization", String("Bearer ") + m_accessToken);
+    const char* trackedHeaders[] = { "X-Rate-Limit-Remaining" };
+    http.collectHeaders(trackedHeaders, 1);
 
     int code = http.GET();
     if (code != 200)
@@ -200,6 +202,7 @@ bool OpenSkyFetcher::fetchStateVectors(double centerLat,
                 HTTPClient retry;
                 retry.begin(url);
                 retry.addHeader("Authorization", String("Bearer ") + m_accessToken);
+                retry.collectHeaders(trackedHeaders, 1);
                 code = retry.GET();
                 if (code != 200)
                 {
@@ -208,6 +211,9 @@ bool OpenSkyFetcher::fetchStateVectors(double centerLat,
                     return false;
                 }
                 String payload = retry.getString();
+                String retryRl = retry.header("X-Rate-Limit-Remaining");
+                if (retryRl.length() > 0)
+                    Log.printf("OpenSkyFetcher: X-Rate-Limit-Remaining: %s\n", retryRl.c_str());
                 retry.end();
 
                 JsonDocument doc;
@@ -264,6 +270,14 @@ bool OpenSkyFetcher::fetchStateVectors(double centerLat,
                         continue;
                     }
 
+                    if (g_config.min_altitude_ft >= 0 &&
+                        (isnan(s.baro_altitude) || s.baro_altitude < g_config.min_altitude_ft / 3.28084f))
+                    {
+                        Log.printf("OpenSkyFetcher: Skipping aircraft below minimum altitude: %.0f ft (threshold: %d ft)\n",
+                                   s.baro_altitude * 3.28084f, g_config.min_altitude_ft);
+                        continue;
+                    }
+
                     s.distance_km = haversineKm(centerLat, centerLon, s.lat, s.lon);
                     if (s.distance_km > radiusKm)
                         continue;
@@ -284,6 +298,9 @@ bool OpenSkyFetcher::fetchStateVectors(double centerLat,
         return false;
     }
     String payload = http.getString();
+    String rl = http.header("X-Rate-Limit-Remaining");
+    if (rl.length() > 0)
+        Log.printf("OpenSkyFetcher: X-Rate-Limit-Remaining: %s\n", rl.c_str());
     http.end();
 
     JsonDocument doc;
@@ -340,6 +357,14 @@ bool OpenSkyFetcher::fetchStateVectors(double centerLat,
             continue;
         }
 
+        if (g_config.min_altitude_ft >= 0 &&
+            (isnan(s.baro_altitude) || s.baro_altitude < g_config.min_altitude_ft / 3.28084f))
+        {
+            Log.printf("OpenSkyFetcher: Skipping aircraft below minimum altitude: %.0f ft (threshold: %d ft)\n",
+                        s.baro_altitude * 3.28084f, g_config.min_altitude_ft);
+            continue;
+        }
+
         s.distance_km = haversineKm(centerLat, centerLon, s.lat, s.lon);
         if (s.distance_km > radiusKm)
             continue;
@@ -385,6 +410,8 @@ bool OpenSkyFetcher::fetchFlightRoute(const String &icao24,
     http.begin(client, url);
     http.setTimeout(TimingConfiguration::OPENSKY_TIMEOUT_MS);
     http.addHeader("Authorization", String("Bearer ") + m_accessToken);
+    const char* trackedHeaders[] = { "X-Rate-Limit-Remaining" };
+    http.collectHeaders(trackedHeaders, 1);
 
     int code = http.GET();
     if (code != 200)
@@ -395,6 +422,9 @@ bool OpenSkyFetcher::fetchFlightRoute(const String &icao24,
     }
 
     String payload = http.getString();
+    String rl = http.header("X-Rate-Limit-Remaining");
+    if (rl.length() > 0)
+        Log.printf("OpenSkyFetcher: X-Rate-Limit-Remaining: %s\n", rl.c_str());
     http.end();
 
     // Response is a top-level JSON array of flight records.

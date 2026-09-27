@@ -60,6 +60,9 @@ struct RuntimeConfig
     // true:            OpenSky → AeroAPI → hexdb  (useful when hexdb is rate-limited)
     bool     opensky_priority;
 
+    // Filtering
+    int      min_altitude_ft;               // ignore aircraft below this altitude; -1 = disabled
+
     // Timing
     uint32_t fetch_interval_seconds;        // used when falling back to OpenSky
     uint32_t local_fetch_interval_seconds;  // used when local ADS-B is the active source

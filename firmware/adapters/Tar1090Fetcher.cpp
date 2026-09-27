@@ -20,7 +20,7 @@ bool Tar1090Fetcher::fetchStateVectors(double centerLat,
     if (strlen(g_config.tar1090_host) == 0)
         return false;   // not configured — caller should fall back to OpenSky
 
-    String url = String("http://") + g_config.tar1090_host + "/tar1090/data/aircraft.json";
+    String url = String("http://") + g_config.tar1090_host + "/data/aircraft.json";
 
     HTTPClient http;
     http.begin(url);
@@ -87,6 +87,13 @@ bool Tar1090Fetcher::fetchStateVectors(double centerLat,
         double dist = haversineKm(centerLat, centerLon, lat, lon);
         if (dist > radiusKm)
             continue;
+
+        if (g_config.min_altitude_ft >= 0)
+        {
+            float altFt = a["alt_baro"] | -1.0f;
+            if (altFt >= 0 && altFt < (float)g_config.min_altitude_ft)
+                continue;
+        }
 
         ++inRadius;
 
