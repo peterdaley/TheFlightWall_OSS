@@ -4,21 +4,24 @@ TheFlightWall is an LED wall which shows live information of flights going by yo
 
 ![Main Image](images/British.jpg)
 
-This fork has two primary purposes:
-1) Change the interface to a HUB75 screen
-2) Use local data from an ADSB reciever (running tar1090)
+This fork is based on an excellent enhancement / rewrite of the original open source code
+by biohead, which allowed the use of a HUB75 screen and a local ADSB receiver as the primary
+source of aircraft and position data, to save on expensive web API calls.
 
-It also adds a working logo lookup (locally stored on the ESP32) as well as a WebUI for some basic settings and display preview.
+This fork contains the following enhancements:
 
-It retains the links to OpenSky Network (Free API) and AeroAPI (Paid API) but both are optional.
-It introduces hexdb.io lookups to try and replace AeroAPI calls where possible.
-
-This has shamelessly been put together with the help of a free trial of Claude Code... 
-It likely could do with lots of refinement, especially around more efficient API calls - be warned if using the paid AeroAPI calls.
+1) A much expanded and cleaned up list of airlines for creation of logos
+2) Addition of a minimum altitude filter, configurable at runtime, to filter ac on the ground
+3) Aadditional logging to track API call consumption
+4) A nicer default aircraft logo for instances when the airline lookup doesn't find a match
+5) More nuanced combination of ADSB and HexDB data to still display flights when full route
+   information cannot be found.
 
 The original project has an official product available:
 
 **Don't feel like building one? Check out the offical product: [theflightwall.com](https://theflightwall.com)**
+
+Biohead's original readme content follows below...
 
 ## Hardware and Firmware
 
@@ -139,6 +142,7 @@ The Web Interface allows a variety of options to be set, shows an approximation 
  - Local ADSB: set this to your tar1090 server
  - Location: Set your Lat/Lon
  - Search Radius
+ - Minimum altitude: ignores a/c below this value in feet; set to zero if no filter required
  - Brightness
  - Screen Orientation: Setting this calibrates the aircraft direction arrow
  - Text Colour

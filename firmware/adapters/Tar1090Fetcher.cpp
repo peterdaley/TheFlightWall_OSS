@@ -10,6 +10,7 @@ Returns false (signals fallback) if host is unconfigured or the request fails.
 #include "adapters/Tar1090Fetcher.h"
 #include "config/RuntimeConfig.h"
 #include "config/TimingConfiguration.h"
+#include "config/APIConfiguration.h"
 #include "utils/TelnetLogger.h"
 
 bool Tar1090Fetcher::fetchStateVectors(double centerLat,
@@ -20,7 +21,7 @@ bool Tar1090Fetcher::fetchStateVectors(double centerLat,
     if (strlen(g_config.tar1090_host) == 0)
         return false;   // not configured — caller should fall back to OpenSky
 
-    String url = String("http://") + g_config.tar1090_host + "/data/aircraft.json";
+    String url = String("http://") + g_config.tar1090_host + APIConfiguration::TAR1090_JSON_PATH;
 
     HTTPClient http;
     http.begin(url);

@@ -19,6 +19,8 @@ namespace APIConfiguration
     // Local ADS-B receiver (tar1090 / readsb / dump1090)
     // Set to the IP or hostname of your receiver.  Leave empty to use OpenSky only.
     static const char *TAR1090_HOST = "";
+    // Specific path to the aircraft.json endpoint on the tar1090 receiver.  Must be specified if a TAR1090 host is set.
+    static const char *TAR1090_JSON_PATH = "/data/aircraft.json";
 
     // FlightWall CDN lookup (no key required)
     static constexpr const char *FLIGHTWALL_CDN_BASE_URL = "https://cdn.theflightwall.com";

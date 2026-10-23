@@ -277,7 +277,9 @@ String NeoMatrixDisplay::buildTelemetryLine1(const FlightInfo &f)
     if (!isnan(f.velocity))
     {
         if (s.length()) s += "  ";
-        s += String((int)round(f.velocity * 1.15078f)) + "mph";
+        // s += String((int)round(f.velocity * 1.15078f)) + "mph";
+        s += String((int)round(f.velocity)) + "kts"; // remove mph conversion and display in knots.
+
     }
     return s.length() ? s : String("No data");
 }

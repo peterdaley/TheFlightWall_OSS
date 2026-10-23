@@ -157,6 +157,25 @@ bool HexDbFetcher::fetchFlightInfo(const String &callsign,
         }
     }
 
+    // -- 1b. Extract the ICAO airline code from the callsign prefix (letters before
+    // the first digit: "MAY1234" → "MAY"). This handles situations where HexDB doesn't
+    // find the aircraft from its ICAO24 hex address but the callsign prefix is still valid.
+    if (outInfo.operator_icao.length() == 0)
+    {
+        String prefix;
+        for (int i = 0; i < (int)callsign.length() && i < 4; ++i)
+        {
+            if (isdigit((unsigned char)callsign[i])) break;
+            prefix += callsign[i];
+        }
+        if (prefix.length() >= 2)
+        {
+            outInfo.operator_icao = prefix;
+            Log.printf("HexDbFetcher: callsign %s → ICAO airline code %s\n",
+                       callsign.c_str(), prefix.c_str());           
+        }
+    }
+
     // ── 2. Route (origin → destination) via callsign ─────────────────────────
     // Response: { "flight": "EZY73CA", "route": "EGKK-EHAM", "updatetime": ... }
     if (callsign.length() > 0)
